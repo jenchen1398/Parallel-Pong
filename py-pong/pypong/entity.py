@@ -25,13 +25,8 @@ class Paddle(object):
         self.bounce_table = [(math.cos(n*math.pi-math.pi/2.0), math.sin(n*math.pi-math.pi/2.0)) for n in angles]
         
     def update(self):
-        # print "paddle update"
-        # print self.bounds_y[0]
-        # print self.bounds_y[1]
-        # print self.rect.height
-        # print self.velocity
-        self.rect.y = max(self.bounds_y[0], min(self.bounds_y[1]-self.rect.height, self.rect.y + self.direction * self.velocity))
-        #self.rect.top = y
+        self.rect.y = max(self.bounds_y[0], min(self.bounds_y[1]-self.rect.height, \
+            self.rect.y + self.direction * self.velocity))
 
     def calculate_bounce(self, delta):
         return self.bounce_table[int(round(delta * (len(self.bounce_table)-1)))]
@@ -52,27 +47,8 @@ class Ball(object):
     def update(self):
         self.position_vec[0] += self.velocity_vec[0]
         self.position_vec[1] += self.velocity_vec[1]
-        # print "before update"
-        # print "x = " + str(self.rect.x)
-        # print "y = " + str(self.rect.y)
-        # print "center = " + str(self.rect.center)
-        # print "top = " + str(self.rect.top)
-        # print "bottom = " + str(self.rect.bottom)
-        # print "left = " + str(self.rect.left)
-        # print "right = " + str(self.rect.right)
-        # print "topleft = " + str(self.rect.topleft)
-        # print ">>>>>>>>>>>>>>>>>>>>>>>>>>>>\n\n"
         self.rect.x = self.position_vec[0]
         self.rect.y = self.position_vec[1]
-        print "after update"
-        print "x = " + str(self.rect.x)
-        print "y = " + str(self.rect.y)
-        print "center = " + str(self.rect.center)
-        print "top = " + str(self.rect.top)
-        print "bottom = " + str(self.rect.bottom)
-        print "left = " + str(self.rect.left)
-        print "right = " + str(self.rect.right)
-        print "topleft = " + str(self.rect.topleft)
     
     def set_position_x(self, value):
         self.position_vec[0] = value

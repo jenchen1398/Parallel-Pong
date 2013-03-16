@@ -34,14 +34,6 @@ def run():
     for x in range(0,num_of_clients):
         clisocket[x] = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         clisocket[x].connect((ip_addresses[x], 20000))
-    #pygame.mixer.pre_init(22050, -16, 2, 1024)
-    #pygame.init()
-    #display_surface = pygame.display.set_mode(configuration['screen_size'])
-    #output_surface = display_surface.copy().convert_alpha()
-    #output_surface.fill((0,0,0))
-    #~ debug_surface = output_surface.copy()
-    #~ debug_surface.fill((0,0,0,0))
-    # debug_surface = None
     clock = time.clock()
     input_state = {'key': None, 'mouse': None}
     
@@ -52,29 +44,13 @@ def run():
     player_left = BasicAIPlayer()
     player_right = BasicAIPlayer()
     game = pypong.Game(player_left, player_right, configuration)
-    # print "x = " + str(game.bounds.x)
-    # print "y = " + str(game.bounds.y)
-    # print "center = " + str(game.bounds.center)
-    # print "top = " + str(game.bounds.top)
-    # print "bottom = " + str(game.bounds.bottom)
-    # print "left = " + str(game.bounds.left)
-    # print "right = " + str(game.bounds.right)
-    # print "topleft = " + str(game.bounds.topleft)
 
     
     # Main game loop
     while game.running:
-        # clock.tick(60)
-        # now = time.get_ticks()
-        # print game.ball.position_vec
-        # print game.paddle_right.rect.center
-        # print game.paddle_left.rect.center
-        #     print clock.get_fps()
-        # input_state['key'] = pygame.key.get_pressed()
-        # input_state['mouse'] = pygame.mouse.get_pos()
         game.update()
-        posvect = struct.pack('iiii', game.ball.position_vec[0], game.ball.position_vec[1], game.paddle_left.rect.y, game.paddle_right.rect.y )
-        # clisocket.sendall(posvect)
+        posvect = struct.pack('iiii', game.ball.position_vec[0], game.ball.position_vec[1], \
+            game.paddle_left.rect.y, game.paddle_right.rect.y )
         # loop over clients and send the coordinates
         for x in range(0,num_of_clients):
             clisocket[x].sendall(posvect)
@@ -82,24 +58,5 @@ def run():
         for x in range(0,num_of_clients):
             clisocket[x].recv(100)
         # time.sleep(3)
-        # 
-
-        #clisocket.recv(100)
-
-	#this is where you would have to send the location out to all of the rpis
-	#So the draw should be changed, everything else can stay the same 
-        #game.draw(output_surface)
-        #~ pygame.surfarray.pixels_alpha(output_surface)[:,::2] = 12
-        #display_surface.blit(output_surface, (0,0))
-        #print( game.ball.position_vec, game.paddle_left.rect.y, game.paddle_right.rect.y )
-
-        # if debug_surface:
-        #     display_surface.blit(debug_surface, (0,0))
-        # #pygame.displ ay.flip()
-        # for event in pygame.event.get():
-        #     if event.type == pygame.QUIT:
-        #         game.running = False
-        #     elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-        #         game.running = False
         
 if __name__ == '__main__': run()

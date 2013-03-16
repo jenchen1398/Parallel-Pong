@@ -1,17 +1,6 @@
 import math, random, entity
 from PIL import Image
 
-# changed from loading an image to "loading", meaning it won't load the any image
-# but set all the proper properties, i.e. the rect of the image, to maintain some 
-# existing pygame code
-#     top, left, bottom, right
-#     topleft, bottomleft, topright, bottomright
-#     midtop, midleft, midbottom, midright
-#     center, centerx, centery
-#     size, width, height
-#     w,h
-# using the image passed in, we make the rect object with the proper bounds 
-
 def line_line_intersect(x1, y1, x2, y2, x3, y3, x4, y4):
     # Taken from http://paulbourke.net/geometry/lineline2d/
     # Denominator for ua and ub are the same, so store this calculation
@@ -41,11 +30,6 @@ class Game(object):
         self.player_left = player_left
         self.player_right = player_right
         self.configuration = configuration
-        # self.background = pygame.Surface(configuration['screen_size'])
-        # self.sprites = pygame.sprite.OrderedUpdates()
-        #line = entity.Line(load_image(configuration['line_image']), self.sprites)
-        #line.rect.topleft = ((configuration['screen_size'][0]-line.rect.width)/2, 0)
-        # paddle_image = load_image(configuration['paddle_image'])
         self.paddle_left = entity.Paddle(configuration['paddle_velocity'], configuration['paddle_image'], \
             configuration['paddle_bounds'])
         self.paddle_right = entity.Paddle(configuration['paddle_velocity'], configuration['paddle_image'], \
@@ -54,18 +38,10 @@ class Game(object):
             (self.configuration['screen_size'][1]-self.paddle_left.rect.height)/2)
         self.paddle_right.rect.topleft = (self.configuration['paddle_right_position'],\
             (self.configuration['screen_size'][1]-self.paddle_left.rect.height)/2)
-        # digit_images = [load_image(configuration['digit_image'] % n) for n in xrange(10)]
-        # self.score_left = entity.Score(digit_images, self.sprites)
-        # self.score_left.rect.topleft = configuration['score_left_position']
-        # self.score_right = entity.Score(digit_images, self.sprites)
-        # self.score_right.rect.topleft = configuration['score_right_position']
-        # ball_rect = load_image(configuration['ball_image'])
         self.ball = entity.Ball( self.configuration['ball_velocity'], configuration['ball_image'] )
         self.bounds = entity.Rect(20, 0, \
-            configuration['screen_size'][0]-self.ball.rect.width-20, configuration['screen_size'][1]-self.ball.rect.height)
-        # self.sound_missed = pygame.mixer.Sound(configuration['sound_missed'])
-        # self.sound_paddle = pygame.mixer.Sound(configuration['sound_paddle'])
-        # self.sound_wall = pygame.mixer.Sound(configuration['sound_wall'])
+            configuration['screen_size'][0]-self.ball.rect.width-20, \
+            configuration['screen_size'][1]-self.ball.rect.height)
         self.reset_game(random.random()<0.5)
         self.running = True
         
@@ -87,15 +63,9 @@ class Game(object):
             self.ball.velocity_vec[0] *= -1
         
     def update(self):
-        # Store previous ball position for line-line intersect test later
-        # self.ball.position_x = self.ball.position_x
-        # self.ball.position_y = self.ball.position_y
-        # Update sprites and players
-        # self.sprites.update()
         self.ball.update()
         self.player_left.update(self.paddle_left, self) # update the rects here
         self.player_right.update(self.paddle_right, self)
-        #print "ball in game update" + str(self.ball.position_x ) + ' ' + str(self.ball.position_y)
         # Paddle collision check. Could probably just do a line-line intersect 
         # but I think I prefer having the pixel-pefect result of a rect-rect 
         # intersect test as well.
