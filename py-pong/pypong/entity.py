@@ -3,6 +3,7 @@ from PIL import Image
 def rect_from_image(path):
     img = Image.open(path)
     width, height = img.size
+    print width,height
     rect = Rect( 0, 0, width, height)
     return rect
 
@@ -10,7 +11,8 @@ class Paddle(object):
     def __init__(self, velocity, image_path, bounds_y, *groups):
         #Sprite.__init__(self, *groups)
         #self.image = image
-        self.rect = rect_from_image(image_path)
+        #self.rect = rect_from_image(image_path)
+        self.rect = Rect( 0, 0, 30, 100)
         self.direction = 0
         self.velocity = velocity
         self.bounds_y = bounds_y
@@ -40,7 +42,8 @@ class Ball(object):
     def __init__(self, velocity, image_path, *groups):
         #Sprite.__init__(self, *groups)
         self.velocity = velocity
-        self.rect = rect_from_image(image_path)
+        #self.rect = rect_from_image(image_path)
+        self.rect = Rect( 0, 0, 96, 96 )
         self.position_vec = [0., 0.]
         self.velocity_vec = [0., 0.]
         

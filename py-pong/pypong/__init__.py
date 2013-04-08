@@ -80,9 +80,9 @@ class Game(object):
                     self.ball.position_y+self.ball.rect.height/2
                 )
                 if intersect_point:
-                    print 'entered intersect point, before' + str(self.ball.position_y)
+                    # print 'entered intersect point, before' + str(self.ball.position_y)
                     self.ball.position_y = intersect_point[1]-self.ball.rect.height/2
-                    print 'entered intersect point, after' + str(self.ball.position_y)
+                    # print 'entered intersect point, after' + str(self.ball.position_y)
                 if intersect_point or (self.paddle_left.rect.colliderect(self.ball.rect)): #and self.ball.rect.right > self.paddle_left.rect.right):
                     self.ball.position_x = self.paddle_left.rect.right
                     velocity = self.paddle_left.calculate_bounce(min(1,max(0,(self.ball.rect.centery - self.paddle_left.rect.y)/float(self.paddle_left.rect.height))))
@@ -91,8 +91,8 @@ class Game(object):
                     self.ball.velocity_vec[1] = velocity[1] * self.ball.velocity
                     self.player_left.hit()
                     #self.play_sound(self.sound_paddle)
-                if (self.paddle_left.rect.colliderect(self.ball.rect)): #and self.ball.rect.right > self.paddle_left.rect.right):
-                    print "detected collision"
+                # if (self.paddle_left.rect.colliderect(self.ball.rect)): #and self.ball.rect.right > self.paddle_left.rect.right):
+                    # print "detected collision"
         else:
             # Right side bullet-through-paper check on ball and paddle.
             if self.ball.velocity_vec[0] > 0:
@@ -114,8 +114,8 @@ class Game(object):
                     self.ball.velocity_vec[0] = -velocity[0] * self.ball.velocity
                     self.ball.velocity_vec[1] = velocity[1] * self.ball.velocity
                     self.player_right.hit()
-                if (self.paddle_right.rect.colliderect(self.ball.rect)): #and self.ball.rect.x < self.paddle_right.rect.x):
-                    print "detected a collision"
+                # if (self.paddle_right.rect.colliderect(self.ball.rect)): #and self.ball.rect.x < self.paddle_right.rect.x):
+                    # print "detected a collision"
                     #self.play_sound(self.sound_paddle)
         # Bounds collision check
         if self.ball.rect.y < self.bounds.top:

@@ -36,18 +36,22 @@ class BasicAIPlayer(object):
         pass
         
 class KeyboardPlayer(object):
-    def __init__(self, input_state, up_key=None, down_key=None):
+    def __init__(self, input_state, up_key = None, down_key = None):
         self.input_state = input_state
         self.up_key = up_key
         self.down_key = down_key
         
     def update(self, paddle, game):
-        if self.input_state['key'][self.up_key]:
+        print self.input_state 
+        print self.up_key
+        if self.input_state == self.up_key:
+            print "here"
             paddle.direction = -1
-        elif self.input_state['key'][self.down_key]:
+        elif self.input_state == self.down_key:
             paddle.direction = 1
         else:
             paddle.direction = 0
+        paddle.update()
 
     def hit(self):
         pass

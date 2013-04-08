@@ -1,7 +1,7 @@
 from pygame.sprite import Sprite
 import pygame
 import sys
-import SocketServer, struct
+import SocketServer, struct, thread
 # import re
 
 screen = None #setting them as global for now, may be better solution
@@ -26,7 +26,7 @@ class requestHandler(SocketServer.StreamRequestHandler):
         global screen, ball, ballrect, paddle_left_rect, paddle_right_rect, bounds,\
             edge_node, paddle_index
         posvec=self.request.recv(16)
-        print(self.client_address)
+        #print(self.client_address)
         while posvec !='':
             pos = struct.unpack( 'iiii',posvec )
             ballrect.x = pos[0] - boundsx[0] # offset the bounds
@@ -40,14 +40,15 @@ class requestHandler(SocketServer.StreamRequestHandler):
                     screen.blit( paddle, paddle_rect )
             pygame.display.flip()
             self.request.send( 'Got it' )
+            #posvec=self.request.recv( 16 )
             try:
                 posvec=self.request.recv( 16 )
             except:
                 print( 'client disconnect' )
-                pygame.quit()
-                sys.exit()
-        pygame.quit()
-        sys.exit()
+        #         pygame.quit()
+        #         sys.exit()
+        # pygame.quit()
+        # sys.exit()
 
 def read_pong_settings():
     # put in seperate function since it's special. Could have been done easier
@@ -78,7 +79,7 @@ def read_pong_settings():
 
 if __name__ == '__main__':
     pygame.init()
-    screen = pygame.display.set_mode( (1360,768) )
+    screen = pygame.display.set_mode( (1920,1200) )
     ball = pygame.image.load( 'assets/ball.png' )
     ballrect = ball.get_rect()
     read_pong_settings()
@@ -86,7 +87,7 @@ if __name__ == '__main__':
         print ";asd"
         paddle = pygame.image.load( 'assets/paddle.png' )
         paddle_rect = paddle.get_rect()
-        paddle_rect.x = 1276
+        paddle_rect.x = 1836 - paddle_rect.width
         edge_node = True #will signal to update paddle as well
         paddle_index = 3
     elif( left_edge_node == 'True' ):
@@ -96,6 +97,8 @@ if __name__ == '__main__':
         paddle_rect.x = 84
         edge_node = True #will signal to update paddle as well
         paddle_index = 2
+    else:
+        edge_node = False
     print ip_address
     server=broadcastServer( ( ip_address, 20000 ), requestHandler )
     server.serve_forever()
