@@ -1,5 +1,5 @@
 import math
-from PIL import Image
+#from PIL import Image
 def rect_from_image(path):
     img = Image.open(path)
     width, height = img.size
@@ -9,7 +9,6 @@ def rect_from_image(path):
 
 class Paddle(object):
     def __init__(self, velocity, image_path, bounds_y, *groups):
-        #Sprite.__init__(self, *groups)
         #self.image = image
         #self.rect = rect_from_image(image_path)
         self.rect = Rect( 0, 0, 30, 100)
@@ -35,12 +34,10 @@ class Paddle(object):
     
 class Line(object):
     def __init__(self, rect, *groups):
-        #Sprite.__init__(self, *groups)
         self.rect = rect
 
 class Ball(object):
     def __init__(self, velocity, image_path, *groups):
-        #Sprite.__init__(self, *groups)
         self.velocity = velocity
         #self.rect = rect_from_image(image_path)
         self.rect = Rect( 0, 0, 96, 96 )
@@ -64,7 +61,7 @@ class Ball(object):
     position_y = property(lambda self: self.position_vec[1], set_position_y)
 
 
-    
+    # left in as is, no attempt was made for scoring yet, other projects
 # class Score(object):
 #     def __init__(self, image_list, *groups):
 #         #Sprite.__init__(self, *groups)

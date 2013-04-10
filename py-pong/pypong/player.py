@@ -35,17 +35,14 @@ class BasicAIPlayer(object):
     def won(self):
         pass
         
-class KeyboardPlayer(object):
+class Player(object):
     def __init__(self, input_state, up_key = None, down_key = None):
         self.input_state = input_state
         self.up_key = up_key
         self.down_key = down_key
         
     def update(self, paddle, game):
-        print self.input_state 
-        print self.up_key
         if self.input_state == self.up_key:
-            print "here"
             paddle.direction = -1
         elif self.input_state == self.down_key:
             paddle.direction = 1
@@ -61,27 +58,4 @@ class KeyboardPlayer(object):
         
     def won(self):
         pass
-        
-class MousePlayer(object):
-    def __init__(self, input_state):
-        self.input_state = input_state
-        pygame.mouse.set_visible(False)
-        
-    def update(self, paddle, game):
-        centery = paddle.rect.centery/int(paddle.velocity)
-        mousey = self.input_state['mouse'][1]/int(paddle.velocity)
-        if centery > mousey:
-            paddle.direction = -1
-        elif centery < mousey:
-            paddle.direction = 1
-        else:
-            paddle.direction = 0
 
-    def hit(self):
-        pass
-
-    def lost(self):
-        pass
-
-    def won(self):
-        pass

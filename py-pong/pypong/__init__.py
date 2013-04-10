@@ -1,5 +1,5 @@
 import math, random, entity
-from PIL import Image
+# from PIL import Image
 
 def line_line_intersect(x1, y1, x2, y2, x3, y3, x4, y4):
     # Taken from http://paulbourke.net/geometry/lineline2d/
@@ -45,9 +45,6 @@ class Game(object):
         self.reset_game(random.random()<0.5)
         self.running = True
         
-    def play_sound(self, sound):
-        if self.configuration['sound']:
-            sound.play()
         
     def reset_game(self, serveLeft=True):
         y = self.configuration['screen_size'][1] - self.ball.rect.height
@@ -80,9 +77,7 @@ class Game(object):
                     self.ball.position_y+self.ball.rect.height/2
                 )
                 if intersect_point:
-                    # print 'entered intersect point, before' + str(self.ball.position_y)
                     self.ball.position_y = intersect_point[1]-self.ball.rect.height/2
-                    # print 'entered intersect point, after' + str(self.ball.position_y)
                 if intersect_point or (self.paddle_left.rect.colliderect(self.ball.rect)): #and self.ball.rect.right > self.paddle_left.rect.right):
                     self.ball.position_x = self.paddle_left.rect.right
                     velocity = self.paddle_left.calculate_bounce(min(1,max(0,(self.ball.rect.centery - self.paddle_left.rect.y)/float(self.paddle_left.rect.height))))
@@ -90,9 +85,6 @@ class Game(object):
                     self.ball.velocity_vec[0] = velocity[0] * self.ball.velocity
                     self.ball.velocity_vec[1] = velocity[1] * self.ball.velocity
                     self.player_left.hit()
-                    #self.play_sound(self.sound_paddle)
-                # if (self.paddle_left.rect.colliderect(self.ball.rect)): #and self.ball.rect.right > self.paddle_left.rect.right):
-                    # print "detected collision"
         else:
             # Right side bullet-through-paper check on ball and paddle.
             if self.ball.velocity_vec[0] > 0:
@@ -114,30 +106,20 @@ class Game(object):
                     self.ball.velocity_vec[0] = -velocity[0] * self.ball.velocity
                     self.ball.velocity_vec[1] = velocity[1] * self.ball.velocity
                     self.player_right.hit()
-                # if (self.paddle_right.rect.colliderect(self.ball.rect)): #and self.ball.rect.x < self.paddle_right.rect.x):
-                    # print "detected a collision"
-                    #self.play_sound(self.sound_paddle)
         # Bounds collision check
         if self.ball.rect.y < self.bounds.top:
-            #print "endtered something"
             self.ball.position_y = float(self.bounds.top)
             self.ball.velocity_vec[1] = -self.ball.velocity_vec[1]
-            #self.play_sound(self.sound_wall)
         elif self.ball.rect.y > self.bounds.bottom:
             self.ball.position_y = float(self.bounds.bottom)
             self.ball.velocity_vec[1] = -self.ball.velocity_vec[1]
-            #self.play_sound(self.sound_wall)
         # Check the ball is still in play
         if self.ball.rect.x < self.bounds.x:
             self.player_left.lost()
             self.player_right.won()
-            #self.score_right.score += 1
             self.reset_game(False)
-            #self.play_sound(self.sound_missed)
         if self.ball.rect.x > self.bounds.right:
             self.player_left.won()
             self.player_right.lost()
-            #self.score_left.score += 1
             self.reset_game(True)
-            #self.play_sound(self.sound_missed)
 

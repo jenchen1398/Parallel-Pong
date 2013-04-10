@@ -1,8 +1,6 @@
-from pygame.sprite import Sprite
 import pygame
 import sys
-import SocketServer, struct, thread
-# import re
+import SocketServer, struct
 
 screen = None #setting them as global for now, may be better solution
 ball = None
@@ -13,20 +11,16 @@ paddle_right = None
 paddle_right_rect = None
 boundsx = [None, None] #left, right
 boundsy = [None, None] #top, bottom
-
-
 black = 0,0,0
-
 
 class broadcastServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
     pass
+
 class requestHandler(SocketServer.StreamRequestHandler):
-    #currentUserLogin={} #{clientArr:accountName}
     def handle(self):
         global screen, ball, ballrect, paddle_left_rect, paddle_right_rect, bounds,\
             edge_node, paddle_index
         posvec=self.request.recv(16)
-        #print(self.client_address)
         while posvec !='':
             pos = struct.unpack( 'iiii',posvec )
             ballrect.x = pos[0] - boundsx[0] # offset the bounds
@@ -40,7 +34,6 @@ class requestHandler(SocketServer.StreamRequestHandler):
                     screen.blit( paddle, paddle_rect )
             pygame.display.flip()
             self.request.send( 'Got it' )
-            #posvec=self.request.recv( 16 )
             try:
                 posvec=self.request.recv( 16 )
             except:
@@ -56,25 +49,18 @@ def read_pong_settings():
     settings = open( 'settings.txt', 'r' )
     line = settings.readline()
     boundsx[0] = int( settings.readline().strip() ) 
-    print boundsx[0]
     line = settings.readline()
     boundsx[1] = int( settings.readline().strip() )
-    print boundsx[1]
     line = settings.readline()
     boundsy[0] = int( settings.readline().strip() ) 
-    print boundsy[0]
     line = settings.readline()
     boundsy[1] = int( settings.readline().strip() )
-    print boundsy[1]
     line = settings.readline()
     right_edge_node = settings.readline().strip() 
-    print right_edge_node
     line = settings.readline()
     left_edge_node = settings.readline().strip() 
-    print left_edge_node
     line = settings.readline()
     ip_address = settings.readline().strip()
-    print ip_address
     settings.close()
 
 if __name__ == '__main__':
@@ -83,15 +69,14 @@ if __name__ == '__main__':
     ball = pygame.image.load( 'assets/ball.png' )
     ballrect = ball.get_rect()
     read_pong_settings()
+    pygame.mouse.set_visible(False)
     if ( right_edge_node == 'True' ):
-        print ";asd"
         paddle = pygame.image.load( 'assets/paddle.png' )
         paddle_rect = paddle.get_rect()
         paddle_rect.x = 1836 - paddle_rect.width
         edge_node = True #will signal to update paddle as well
         paddle_index = 3
     elif( left_edge_node == 'True' ):
-        print 'sddf'
         paddle = pygame.image.load( 'assets/paddle.png' )
         paddle_rect = paddle.get_rect()
         paddle_rect.x = 84
@@ -99,7 +84,6 @@ if __name__ == '__main__':
         paddle_index = 2
     else:
         edge_node = False
-    print ip_address
     server=broadcastServer( ( ip_address, 20000 ), requestHandler )
     server.serve_forever()
     while 1:
