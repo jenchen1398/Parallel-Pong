@@ -1,4 +1,7 @@
 import math
+
+PADDLE_LENGTH = 100
+
 #from PIL import Image
 def rect_from_image(path):
     img = Image.open(path)
@@ -11,7 +14,7 @@ class Paddle(object):
     def __init__(self, velocity, image_path, bounds_y, *groups):
         #self.image = image
         #self.rect = rect_from_image(image_path)
-        self.rect = Rect( 0, 0, 30, 100)
+        self.rect = Rect( 0, 0, 30, PADDLE_LENGTH)
         self.direction = 0
         self.velocity = velocity
         self.bounds_y = bounds_y

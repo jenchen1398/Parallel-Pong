@@ -8,7 +8,7 @@ def setup(ip, port, display):
     configuration = {
         'screen_size': display,
         'paddle_image': 'assets/paddle.png',
-        'paddle_left_position': 184.,
+        'paddle_left_position': 10,
         'paddle_right_position': display[0] - pygame.image.load( 'assets/paddle.png' ).get_rect().w,
         'paddle_velocity': 120.,
         'paddle_bounds': (1, 768),  
@@ -18,6 +18,8 @@ def setup(ip, port, display):
         'ball_velocity_bounce_multiplier': 1.105,
         'ball_velocity_max': 130.,
     }
+
+    print configuration['paddle_right_position']
     #make a socket, and connect to a already running server socket
     # read some file with the ip addresses and put them in the variables ip addersses
     # hard coded for now
@@ -31,8 +33,8 @@ def setup(ip, port, display):
     connections.append(server_socket)
 
     # Prepare game
-    player_left = Player(None, 'up', 'down')
-    player_right = Player(None, 'up', 'down')
+    player_left = BasicAIPlayer()#None, 'up', 'down')
+    player_right = BasicAIPlayer()#None, 'up', 'down')
     
     #player_left = BasicAIPlayer()
     #player_right = BasicAIPlayer()
@@ -57,7 +59,7 @@ def setup(ip, port, display):
         # wait for them to send stuff back to avoid a race condition.
         #for x in range( 0,len( clisocket ) ):
             #clisocket[x].recv( 16 )
-        time.sleep(0.1)
+        time.sleep(1./12)
 
     print 'server is closing'
     server_socket.close()

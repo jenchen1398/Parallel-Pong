@@ -1,18 +1,11 @@
 import pygame
 import sys
 import socket, struct, select, threading
+import pypong.entity as entity
+import os
 
-#screen = None #setting them as global for now, may be better solution
-#ball = None
-#ballrect = None
-#paddle_left = None #these should be in array, just trying to make it work for now
-#paddle_left_rect = None
-#paddle_right = None
-#paddle_right_rect = None
-#boundsx = [None, None] #left, right
-#boundsy = [None, None] #top, bottom
+
 BLACK = 0,0,0
-
 LEFT_PADDLE = 2
 RIGHT_PADDLE = 3
 
@@ -24,22 +17,27 @@ def handle(posvec, tile):
         sys.exit()
 
     data = struct.unpack( 'iiii',posvec )
-    paddle_index = tile.paddle_index
-    paddle_rect = tile.paddle.get_rect()
-
-    ballrect   = tile.ball.get_rect()
-    ballrect.x = data[0] - tile.left_edge # offset the bounds
-    ballrect.y = data[1] - tile.top_edge 
-
-
-
     tile.screen.fill( BLACK )
+    
+    paddle_index = tile.paddle_index
+ 
+    paddleTopEdge = data[paddle_index]
+    paddleBotEdge = paddleTopEdge + entity.PADDLE_LENGTH
 
-    if ( data[0] > tile.left_edge - 96 and data[1] < tile.right_edge ):
+
+    ballRightEdge = data[0] + 96
+    ballLeftEdge  = data[1]
+
+
+    if ( ballRightEdge > tile.left_edge and ballLeftEdge < tile.right_edge ):
+        ballrect   = tile.ball.get_rect()
+        ballrect.x = data[0] - tile.left_edge # offset the bounds
+        ballrect.y = data[1] - tile.top_edge 
         tile.screen.blit( tile.ball, ballrect )
 
     if tile.isEdge:
-        if ( data[paddle_index] > tile.top_edge and data[paddle_index] < tile.bot_edge  ):
+        if ( paddleBotEdge > tile.top_edge and paddleTopEdge < tile.bot_edge  ):
+            paddle_rect  = tile.paddle.get_rect()
             if paddle_index == RIGHT_PADDLE:
                 paddle_rect.x = tile.right_edge - (paddle_rect.w + tile.left_edge)
             paddle_rect.y = data[paddle_index] - tile.top_edge
@@ -65,10 +63,12 @@ def read_pong_settings(left_edge, right_edge, bot_edge, top_edge, tile):
     tile.bot_edge = bot_edge
     tile.top_edge = top_edge
 
-def setup(ip, port, display, total_display):
+def setup(ip, port, display, total_display, coords = None):
+    if coords != None:
+        os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % coords
     pygame.init()
     tile = Tile()
-    tile.screen = pygame.display.set_mode( (display['right'] - display['left'], display['bot'] - display['top']) )
+    tile.screen = pygame.display.set_mode( (display['right'] - display['left'], display['bot'] - display['top']))
 
     tile.ball = pygame.image.load( 'assets/ball.png' )
 
@@ -80,8 +80,6 @@ def setup(ip, port, display, total_display):
         print 'right_edge_node'
         tile.paddle = pygame.image.load( 'assets/paddle.png' )
         paddle_rect = tile.paddle.get_rect()
-        print paddle_rect.w
-        tile.paddle.get_rect().x = 50#(display['right'] - (1920 - 1836)) - paddle_rect.width
         tile.isEdge = True #will signal to update paddle as well
         tile.paddle_index = RIGHT_PADDLE
 
@@ -115,12 +113,9 @@ def setup(ip, port, display, total_display):
         for sock in read_sockets:
             if tile.active:
                 posvec = sock.recv(16)
-            #print 'posvec = ' + posvec
             if not posvec:
-                print 'not posvec'
                 sys.exit()
 
-            
             handle(posvec, tile)
 
         
