@@ -5,13 +5,14 @@ player_left = None # set the players as global so the control thread has access
 player_right = None # simplest way to do it
 def setup(ip, port, display):
     global player_left, player_right
+    rect = pygame.image.load( 'assets/paddle.png' ).get_rect()
     configuration = {
         'screen_size': display,
         'paddle_image': 'assets/paddle.png',
         'paddle_left_position': 10,
-        'paddle_right_position': display[0] - pygame.image.load( 'assets/paddle.png' ).get_rect().w,
+        'paddle_right_position': display[0] - rect.w,
         'paddle_velocity': 120.,
-        'paddle_bounds': (1, 768),  
+        'paddle_bounds': (1, display[1] - 1),  
         'line_image': 'assets/dividing-line.png',
         'ball_image': 'assets/ball.png',
         'ball_velocity': 80.,
@@ -33,14 +34,19 @@ def setup(ip, port, display):
     connections.append(server_socket)
 
     # Prepare game
-    player_left = BasicAIPlayer()#None, 'up', 'down')
-    player_right = BasicAIPlayer()#None, 'up', 'down')
+    #player_left  = BasicAIPlayer()#None, 'up', 'down')
+    player_left  = Player(None, 'up', 'down')
+    #player_right = BasicAIPlayer()#None, 'up', 'down')
+    player_right = Player(None, 'up', 'down')
     
     #player_left = BasicAIPlayer()
     #player_right = BasicAIPlayer()
+
+    threading.Thread(target = ctrls).start()
+
+    pygame.init()
+    pygame.display.set_mode((200,200))
     game = pypong.Game(player_left, player_right, configuration)
-    #controls = RPIGPIO()
-    #controls.start()
     # Main game loop
     while game.running:
         if findnewConnections(connections, server_socket):
@@ -79,33 +85,28 @@ def findnewConnections(connections, server_socket):
     return False
 
 
-class RPIGPIO( threading.Thread ):
-    def run( self ):
-        global player_left, player_right
-        #GPIO.setwarnings( False )
-        #GPIO.setmode( GPIO.BOARD )
-        up1 = 7
-        down1 = 11
-        up2 = 13
-        down2 = 15
-       # GPIO.setup( up1, GPIO.IN, pull_up_down=GPIO.PUD_DOWN )
-       # GPIO.setup( down1, GPIO.IN, pull_up_down=GPIO.PUD_DOWN )
-       # GPIO.setup( up2, GPIO.IN, pull_up_down=GPIO.PUD_DOWN )
-       # GPIO.setup( down2, GPIO.IN, pull_up_down=GPIO.PUD_DOWN )
+def ctrls():
+    print 'running'
+    global player_left, player_right       
 
-        while True:
-            #if GPIO.input( up1 ):
-                player_left.input_state = 'up'
-            #elif GPIO.input( down1 ):
-                player_left.input_state = 'down'
-            #else:
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
                 player_left.input_state = None
-
-           # if GPIO.input( up2 ):
-                player_right.input_state = 'up'
-           # elif GPIO.input( down2 ):
-                player_right.input_state = 'down'
-           # else:
                 player_right.input_state = None
-        
+                
+                if event.key == pygame.K_r:
+                    player_right.input_state = 'up'
+                if event.key == pygame.K_f:
+                    player_right.input_state = 'down'
+
+                if event.key == pygame.K_UP:
+                    player_left.input_state = 'up'
+                if event.key == pygame.K_DOWN:
+                    player_left.input_state = 'down'
+            if event.type == pygame.KEYUP:
+                player_left.input_state = None
+                player_right.input_state = None
+
+    
 
