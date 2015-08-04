@@ -102,9 +102,6 @@ def setup(ip, port, display, total_display, coords = None):
     except :
         print 'Unable to connect'
         sys.exit()
-     
-
-    threading.Thread(target = detectClose, args = [s, tile]).start()
 
 
     while 1:
@@ -117,22 +114,6 @@ def setup(ip, port, display, total_display, coords = None):
                 sys.exit()
 
             handle(posvec, tile)
-
-        
-
-   
-def detectClose(socket, tile):
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                socket.send('j')
-                tile.active = False
-                pygame.display.quit()
-                pygame.quit()
-                sys.exit()
-
-
-
 
 class Tile:
     active = True

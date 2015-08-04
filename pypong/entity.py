@@ -47,6 +47,14 @@ class Ball(object):
         self.position_vec = [0., 0.]
         self.velocity_vec = [0., 0.]
         
+    def getWindow(self, game):
+        display_size = game.configuration['screen_size']
+        mini_display_size = game.configuration['individual_screen_size']
+        x = math.ceil(float(display_size[0]) / mini_display_size[0])
+        y = math.ceil(float(display_size[1]) / mini_display_size[1])
+        return str(int(x)) + "-" + str(int(y))
+
+
     def update(self):
         self.position_vec[0] += self.velocity_vec[0]
         self.position_vec[1] += self.velocity_vec[1]

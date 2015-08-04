@@ -27,6 +27,7 @@ def line_line_intersect(x1, y1, x2, y2, x3, y3, x4, y4):
     
 class Game(object):
     def __init__(self, player_left, player_right, configuration):
+        self.count = 0
         self.player_left = player_left
         self.player_right = player_right
         self.configuration = configuration
@@ -47,8 +48,10 @@ class Game(object):
         
         
     def reset_game(self, serveLeft=True):
-        print 'new game'
+        print 'new game: ' + str(self.count)
+        self.count += 1
         time.sleep(2)
+
         y = self.configuration['screen_size'][1] - self.ball.rect.height
         self.ball.position_x = (self.configuration['screen_size'][0]-self.ball.rect.width)/2.0
         self.ball.position_y = y * random.random()
@@ -61,6 +64,8 @@ class Game(object):
         if serveLeft:
             self.ball.velocity_vec[0] *= -1
         
+
+
     def update(self):
         self.ball.update()
         self.player_left.update(self.paddle_left, self) # update the rects here
@@ -86,7 +91,7 @@ class Game(object):
                     self.ball.velocity = min(self.configuration['ball_velocity_max'], self.ball.velocity * self.configuration['ball_velocity_bounce_multiplier'])
                     self.ball.velocity_vec[0] = velocity[0] * self.ball.velocity
                     self.ball.velocity_vec[1] = velocity[1] * self.ball.velocity
-                    self.player_left.hit()
+                    self.player_left.hit(self.ball.getWindow(self))
         else:
             # Right side bullet-through-paper check on ball and paddle.
             if self.ball.velocity_vec[0] > 0:
@@ -107,14 +112,16 @@ class Game(object):
                         self.ball.velocity * self.configuration['ball_velocity_bounce_multiplier'])
                     self.ball.velocity_vec[0] = -velocity[0] * self.ball.velocity
                     self.ball.velocity_vec[1] = velocity[1] * self.ball.velocity
-                    self.player_right.hit()
+                    self.player_right.hit(self.ball.getWindow(self))
         # Bounds collision check
         if self.ball.rect.y < self.bounds.top:
             self.ball.position_y = float(self.bounds.top)
             self.ball.velocity_vec[1] = -self.ball.velocity_vec[1]
+            pong_sound.wall_hit(self.ball.getWindow(self))
         elif self.ball.rect.y > self.bounds.bottom:
             self.ball.position_y = float(self.bounds.bottom)
             self.ball.velocity_vec[1] = -self.ball.velocity_vec[1]
+            pong_sound.wall_hit(self.ball.getWindow(self))
         # Check the ball is still in play
         if self.ball.rect.x < self.bounds.x:
             self.player_left.lost()

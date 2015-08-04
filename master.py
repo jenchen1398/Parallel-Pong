@@ -3,11 +3,14 @@ from pypong.player import BasicAIPlayer, Player
 
 player_left = None # set the players as global so the control thread has access
 player_right = None # simplest way to do it
-def setup(ip, port, display):
+
+running = True
+def setup(ip, port, display, mini_display):
     global player_left, player_right
     rect = pygame.image.load( 'assets/paddle.png' ).get_rect()
     configuration = {
         'screen_size': display,
+        'individual_screen_size': mini_display,
         'paddle_image': 'assets/paddle.png',
         'paddle_left_position': 10,
         'paddle_right_position': display[0] - rect.w,
@@ -20,7 +23,6 @@ def setup(ip, port, display):
         'ball_velocity_max': 130.,
     }
 
-    print configuration['paddle_right_position']
     #make a socket, and connect to a already running server socket
     # read some file with the ip addresses and put them in the variables ip addersses
     # hard coded for now
@@ -38,34 +40,31 @@ def setup(ip, port, display):
     player_left  = Player(None, 'up', 'down')
     #player_right = BasicAIPlayer()#None, 'up', 'down')
     player_right = Player(None, 'up', 'down')
-    
-    #player_left = BasicAIPlayer()
-    #player_right = BasicAIPlayer()
-
-    threading.Thread(target = ctrls).start()
 
     pygame.init()
     pygame.display.set_mode((200,200))
     game = pypong.Game(player_left, player_right, configuration)
+
+
+
+    threading.Thread(target = ctrls, args = [game]).start()
+
+
     # Main game loop
     while game.running:
-        if findnewConnections(connections, server_socket):
-            break
+        findnewConnections(connections, server_socket)
         game.update()
 
-        #print str(game.ball.position_vec[0]) + '-' + str(game.ball.position_vec[1]) + '-' + str(game.paddle_left.rect.y) + '-' + str(game.paddle_right.rect.y)
-
-        posvect = struct.pack('iiii', game.ball.position_vec[0], game.ball.position_vec[1], game.paddle_left.rect.y, game.paddle_right.rect.y )
+        coordinates = struct.pack('iiii', game.ball.position_vec[0], game.ball.position_vec[1], game.paddle_left.rect.y, game.paddle_right.rect.y )
         # loop over clients and send the coordinates
         for sock in connections:
-            if sock != server_socket:
-                sock.send(posvect)
-        
+            if sock is not server_socket:
+                sock.send(coordinates)
 
         # wait for them to send stuff back to avoid a race condition.
         #for x in range( 0,len( clisocket ) ):
             #clisocket[x].recv( 16 )
-        time.sleep(1./12)
+        
 
     print 'server is closing'
     server_socket.close()
@@ -77,20 +76,17 @@ def findnewConnections(connections, server_socket):
         if sock == server_socket:
             sockfd, addr = server_socket.accept()
             connections.append(sockfd)
-        else:
-            connections.remove(sock)
-            sock.close()
-            return True
-
-    return False
 
 
-def ctrls():
-    print 'running'
+
+def ctrls(game):
     global player_left, player_right       
 
     while True:
         for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                game.running = False
+
             if event.type == pygame.KEYDOWN:
                 player_left.input_state = None
                 player_right.input_state = None
@@ -104,6 +100,9 @@ def ctrls():
                     player_left.input_state = 'up'
                 if event.key == pygame.K_DOWN:
                     player_left.input_state = 'down'
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+
             if event.type == pygame.KEYUP:
                 player_left.input_state = None
                 player_right.input_state = None

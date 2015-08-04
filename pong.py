@@ -17,7 +17,7 @@ def disp(section, start):
 	Process(target = pongdisplay.setup, args= [ip, port, section, total_display, start]).start()
 
 
-local = (len(sys.argv) != 1)
+local = (len(sys.argv) == 3)
 
 if local:
 	totalwidth = 900
@@ -26,8 +26,8 @@ if local:
 	ip = "0.0.0.0"
 	port = 5000
 
-	rows = 3
-	cols = 5
+	rows = int(sys.argv[1])
+	cols = int(sys.argv[2])
 
 	for w in reversed(range(rows)):
 		for h in range(cols):
@@ -41,19 +41,23 @@ if local:
 
 			disp(toBounds(left, right ,top, bot), (left,top) )
 
-	master = Process(target = master.setup, args = [ip, port, (totalwidth, totalheight)])
+	big_display = (totalwidth, totalheight)
+	mini_display = totalwidth/cols, totalheight/rows
+
+	master = Process(target = master.setup, args = [ip, port, big_display, mini_display])
 	master.start()
 
 else:
 	TOTAL_WIDTH = 1920 * 5
 	TOTAL_HEIGHT = 1200 * 3
+	mini_display = 1920, 1200
 	COLS = 5
 	ROWS = 3
 	name = platform.node()
 	print not name.startswith('tile-')
 	ip = "10.10.0.255"
 	if name == 'master':
-		master.setup(ip, port, (totalwidth, totalheight))
+		master.setup(ip, port, (TOTAL_WIDTH, TOTAL_HEIGHT), mini_display)
 	elif True:
 		'pong running on odd computer'
 	else:
